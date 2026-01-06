@@ -16,6 +16,47 @@ const TransactionCreateBody = t.Composite([
 ]);
 
 export const transactionController = new Elysia({ prefix: "/transaction" })
+  .get("/", async () => {
+    const transactions = await prisma.transaction.findMany({
+      select: {
+        id: true,
+        type: true,
+        amount: true,
+        tag: true,
+        createdAt: true,
+        occurredAt: true,
+        atAccount: true,
+        toAccount: true,
+      },
+    });
+
+    // Only return toAccount if it exists
+    return transactions.map((t) => {
+      const { toAccount, ...rest } = t;
+      return toAccount ? { ...rest, toAccount } : rest;
+    });
+  })
+  .get("/:id", async ({ params: { id }, status }) => {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        type: true,
+        amount: true,
+        tag: true,
+        createdAt: true,
+        occurredAt: true,
+        atAccount: true,
+        toAccount: true,
+      },
+    });
+
+    if (!transaction) return status(404, "Transaction not found");
+
+    // Only return toAccount if it exists
+    const { toAccount, ...rest } = transaction;
+    return toAccount ? { ...rest, toAccount } : rest;
+  })
   .post(
     "/create",
     async ({ body }) => {
@@ -53,31 +94,5 @@ export const transactionController = new Elysia({ prefix: "/transaction" })
         200: TransactionPlain,
         404: t.String(),
       },
-    }
-  )
-  .get(
-    "/:id",
-    async ({ params: { id }, status }) => {
-      const transaction = await prisma.transaction.findUnique({
-        where: { id: parseInt(id) },
-      });
-
-      if (!transaction) return status(404, "Transaction not found");
-      return transaction;
-    },
-    {
-      response: {
-        200: TransactionPlain,
-        404: t.String(),
-      },
-    }
-  )
-  .get(
-    "/",
-    async () => {
-      return prisma.transaction.findMany();
-    },
-    {
-      response: t.Array(TransactionPlain),
     }
   );
