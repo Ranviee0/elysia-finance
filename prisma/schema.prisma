@@ -1,0 +1,51 @@
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "sqlite"
+}
+
+enum TransactionType {
+    INCOME
+    EXPENSE
+    TRANSFER
+}
+
+generator prismabox {
+    provider                    = "prismabox"
+    typeboxImportDependencyName = "elysia"
+    typeboxImportVariableName   = "t"
+    inputModel                  = true
+    output                      = "../generated/prismabox"
+}
+
+model Account {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    outgoingTransactions Transaction[] @relation("FromAccount")
+    incomingTransactions Transaction[] @relation("ToAccount")
+}
+
+model Transaction {
+    id          Int             @id @default(autoincrement())
+    amount      Float
+    atAccountId Int
+    atAccount   Account         @relation("FromAccount", fields: [atAccountId], references: [id])
+    toAccountId Int?
+    toAccount   Account?        @relation("ToAccount", fields: [toAccountId], references: [id])
+    type        TransactionType
+    tag         String?
+    occurredAt  DateTime
+    createdAt   DateTime        @default(now())
+}
+
+model CreditTransaction {
+    id         Int      @id @default(autoincrement())
+    amount     Float
+    tag        String?
+    occurredAt DateTime
+    createdAt  DateTime @default(now())
+}

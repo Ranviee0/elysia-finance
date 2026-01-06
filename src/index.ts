@@ -1,7 +1,13 @@
 import { Elysia } from "elysia";
+import { openapi } from "@elysiajs/openapi";
+import { transactionController } from "@/controllers/transaction";
+import { accountController } from "@/controllers/account";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+new Elysia()
+  .get("/", () => "Elysia Finance API")
+  .use(openapi())
+  .use(transactionController)
+  .use(accountController)
+  .listen(3000, () => {
+    console.log("🦊 Elysia is running at http://localhost:3000");
+  });
