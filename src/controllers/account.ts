@@ -5,30 +5,25 @@ import {
   AccountInputUpdate,
 } from "@generated/prismabox/Account";
 import { prisma } from "@/lib/prisma";
-import { calculateAccountBalance, calculateAllBalances } from "@/lib/balance";
+import { calculateAccountBalance } from "@/lib/balance";
 
 export const accountController = new Elysia({ prefix: "/account" })
-  .get(
-    "/:id",
-    async ({ params: { id }, status }) => {
-      const account = await prisma.account.findUnique({
-        where: { id: parseInt(id) },
-      });
+  .get("/:id", async ({ params: { id }, status }) => {
+    const account = await prisma.account.findUnique({
+      where: { id: parseInt(id) },
+    });
 
-      if (!account) return status(404, "Account not found");
-      
-      const balance = await calculateAccountBalance(account.id);
-      return { ...account, balance };
-    }
-  )
+    if (!account) return status(404, "Account not found");
+
+    const balance = await calculateAccountBalance(account.id);
+    return { ...account, balance };
+  })
   .get("/all", async () => {
     const accounts = await prisma.account.findMany();
-    const balances = await calculateAllBalances();
-    
+
     return accounts.map((account) => ({
       ...account,
       id: parseInt(String(account.id)),
-      balance: balances[account.id] || 0,
     }));
   })
   .post(
