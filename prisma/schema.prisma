@@ -29,6 +29,20 @@ model Account {
     incomingTransactions Transaction[] @relation("ToAccount")
 }
 
+model TagGroup {
+    id   Int    @id @default(autoincrement())
+    name String
+    tags Tag[]
+}
+
+model Tag {
+    id           Int           @id @default(autoincrement())
+    name         String
+    groupId      Int
+    group        TagGroup      @relation(fields: [groupId], references: [id])
+    transactions Transaction[]
+}
+
 model Transaction {
     id          Int             @id @default(autoincrement())
     amount      Float
@@ -37,7 +51,8 @@ model Transaction {
     toAccountId Int?
     toAccount   Account?        @relation("ToAccount", fields: [toAccountId], references: [id])
     type        TransactionType
-    tag         String?
+    tagId       Int?
+    tag         Tag?            @relation(fields: [tagId], references: [id])
     occurredAt  DateTime
     createdAt   DateTime        @default(now())
 }
