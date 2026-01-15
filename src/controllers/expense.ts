@@ -8,7 +8,7 @@ export const expenseController = new Elysia({
   "/create",
   async ({ body, status }) => {
     const occurredAt = body.occurredAt ? new Date(body.occurredAt) : new Date();
-    occurredAt.setHours(0, 0, 0, 0);
+    occurredAt.setUTCHours(0, 0, 0, 0);
 
     const expenseTransaction = await prisma.transaction.create({
       data: {
