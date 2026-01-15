@@ -2,7 +2,7 @@ import { Elysia, t } from "elysia";
 import { prisma } from "@/lib/prisma";
 
 export const historyController = new Elysia({ prefix: "/history" }).get(
-  "/",
+  "/all",
   async ({ query }) => {
     const accountId = parseInt(query.accountId);
 
