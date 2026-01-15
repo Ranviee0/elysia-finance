@@ -10,6 +10,12 @@ export const expenseController = new Elysia({
     const occurredAt = body.occurredAt ? new Date(body.occurredAt) : new Date();
     occurredAt.setUTCHours(0, 0, 0, 0);
 
+    // Check if expense would make account negative
+    const currentBalance = await calculateAccountBalance(body.atAccountId);
+    if (currentBalance - body.amount < 0) {
+      return status(400, "Insufficient balance");
+    }
+
     const expenseTransaction = await prisma.transaction.create({
       data: {
         type: "EXPENSE",
