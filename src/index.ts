@@ -7,6 +7,7 @@ import { tagGroupController } from "./controllers/tag-group";
 import { tagController } from "@/controllers/tag";
 import { incomeController } from "./controllers/income";
 import { expenseController } from "./controllers/expense";
+import { historyController } from "./controllers/history";
 import { Tag } from "@generated/prismabox/Tag";
 
 new Elysia()
@@ -19,6 +20,7 @@ new Elysia()
   .use(tagGroupController)
   .use(incomeController)
   .use(expenseController)
+  .use(historyController)
   .listen(3000, () => {
     console.log("🦊 Elysia is running at http://localhost:3000");
   });
